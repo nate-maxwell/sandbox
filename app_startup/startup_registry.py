@@ -12,11 +12,20 @@ logger = logging.getLogger(__name__)
 class Priority(IntEnum):
     """Startup task priorities - lower values run first"""
 
-    CRITICAL = 0  # Core systems (event broker, logging)
-    HIGH = 1  # Config, templates, paths
-    NORMAL = 2  # Most tools/plugins
-    LOW = 3  # UI, optional features
-    DEFERRED = 4  # Background tasks
+    CRITICAL = 0x1
+    """Core systems (event broker, logging, ...)."""
+
+    HIGH = 0x2
+    """Config, templates, paths..."""
+
+    NORMAL = 0x3
+    """Most tools/plugins."""
+
+    LOW = 0x4
+    """UI, optional features."""
+
+    DEFERRED = 0x5
+    """Background tasks."""
 
 
 @dataclass(order=True)
