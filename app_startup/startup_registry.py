@@ -1,3 +1,14 @@
+"""
+Stage 2: Startup task registry and process assembler.
+
+Provides a priority-based task registration system for pipeline initialization.
+
+Startup tasks are the processes that execute on application startup.
+
+Tasks are registered via decorator or direct registration, then executed in
+priority order by Stage 4 (dcc_startup) after the DCC launches.
+"""
+
 import logging
 from typing import Callable
 from typing import Optional
@@ -30,17 +41,32 @@ class Priority(IntEnum):
 
 @dataclass(order=True)
 class StartupTask(object):
-    """A startup task with priority and execution details"""
+    """A startup task with priority and execution details."""
 
     priority: int = field(compare=True)
+    """
+    Which order should the task be executed in.
+    Higher values are executed later.
+    """
+
     name: str = field(compare=False)
+    """Name, for the record."""
+
     callback: Callable = field(compare=False)
+    """The actual task function to run."""
+
     enabled: bool = field(default=True, compare=False)
+    """
+    If the task will run or not.
+    Sometimes certain tasks may be experimental and are not loaded.
+    """
+
     description: str = field(default="", compare=False)
+    """Description, for the record."""
 
 
 class StartupRegistry(object):
-    """Registry for application startup tasks"""
+    """Registry for application startup tasks."""
 
     def __init__(self) -> None:
         self._tasks: list[StartupTask] = []
@@ -67,9 +93,9 @@ class StartupRegistry(object):
         return task
 
     def get_tasks(self, enabled_only: bool = True) -> list[StartupTask]:
-        """Get all tasks, sorted by priority"""
+        """Get all tasks, sorted by priority."""
         tasks = [t for t in self._tasks if not enabled_only or t.enabled]
-        return sorted(tasks)
+        return sorted(tasks)  # type: ignore[type-var]
 
     def execute_all(self) -> None:
         """Execute all enabled tasks in priority order"""
@@ -85,12 +111,12 @@ class StartupRegistry(object):
                 # Optionally: decide if you want to continue or halt on errors
 
     def clear(self) -> None:
-        """Clear all registered tasks (useful for testing)"""
+        """Clear all registered tasks (useful for testing)."""
         self._tasks.clear()
 
 
-# Global registry instance
 _registry = StartupRegistry()
+"""Global registry instance."""
 
 
 def startup_task(
@@ -99,7 +125,7 @@ def startup_task(
     description: str = "",
     enabled: bool = True,
 ) -> Callable:
-    """Decorator to register a function as a startup task"""
+    """Decorator to register a function as a startup task."""
 
     def decorator(func: Callable) -> Callable:
         _registry.register(
@@ -115,5 +141,5 @@ def startup_task(
 
 
 def get_registry() -> StartupRegistry:
-    """Get the global startup registry"""
+    """Get the global startup registry."""
     return _registry
