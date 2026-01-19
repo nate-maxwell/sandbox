@@ -3,8 +3,9 @@ Stage 1: Environment builder.
 
 Constructs environment variables before launching DCC applications.
 Handles PYTHONPATH construction, plugin paths, project context variables,
-and custom environment modifiers. The built environment is passed to
-subprocess.Popen in Stage 3 (dcc_launcher).
+and custom environment modifiers.
+
+The built environment is passed to subprocess.Popen in Stage 3 (dcc_launcher).
 """
 
 import os
