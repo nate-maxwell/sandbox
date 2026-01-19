@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from enum import Enum
 from enum import IntEnum
+from typing import Optional
 
 
 class DCCType(Enum):
@@ -42,21 +43,16 @@ class EnvironmentConfig(object):
 
     pipeline_root: Path
     project_root: Path
-
     dcc_type: DCCType
+
     dcc_version: str = None
-
-    project_name: str = "default"
-    show_name: str = None
-    shot_name: str = None
-    department: str = "generic"
-
-    user: str = field(default_factory=lambda: os.getenv("USER", "unknown"))
     developer_level: DeveloperLevel = DeveloperLevel.USER
 
-    experimental_features: bool = False
-    debug_mode: bool = False
+    context: dict[str, str] = field(default_factory=dict)
+    """Flexible context dict - gets converted to environment variables."""
+
     custom_vars: dict[str, str] = field(default_factory=dict)
+    """Additional environment variables to set."""
 
 
 class EnvironmentBuilder(object):
@@ -93,32 +89,27 @@ class EnvironmentBuilder(object):
         """Build core pipeline environment variables."""
         self._env["PIPELINE_ROOT"] = str(self.config.pipeline_root)
         self._env["PROJECT_ROOT"] = str(self.config.project_root)
-        self._env["PROJECT"] = self.config.project_name
-
-        if self.config.show_name:
-            self._env["SHOW"] = self.config.show_name
-        if self.config.shot_name:
-            self._env["SHOT"] = self.config.shot_name
-
-        self._env["DEPARTMENT"] = self.config.department
-        self._env["PIPELINE_USER"] = self.config.user
-        self._env["DEVELOPER_LEVEL"] = str(self.config.developer_level.value)
         self._env["DCC_TYPE"] = self.config.dcc_type.value
 
         if self.config.dcc_version:
             self._env["DCC_VERSION"] = self.config.dcc_version
-        if self.config.experimental_features:
-            self._env["ENABLE_EXPERIMENTAL"] = "1"
-        if self.config.debug_mode:
-            self._env["PIPELINE_DEBUG"] = "1"
 
+        self._env["VIZ_DEV_LEVEL"] = str(self.config.developer_level.value)
+
+        self._env.update(self.config.context)
         self._env.update(self.config.custom_vars)
 
-    def _get_dcc_site_packages(self) -> str | None:
+    def _get_dcc_site_packages(self) -> Optional[str]:
         """Get the site packages path for the DCC (must be first in PYTHONPATH)."""
         # This needs to be constructed based on DCC type/version/platform
         # Override this method or pass in via config if needed
         return None
+
+    def _build_dcc_paths(self) -> None:
+        """Build DCC-specific plugin and script paths."""
+        # Override this method to add DCC-specific paths
+        # Example: self.add_plugin_path('MAYA_SCRIPT_PATH', Path('/path'))
+        pass
 
     def _finalize_paths(self) -> None:
         """Convert path lists to environment variable strings."""
@@ -162,6 +153,7 @@ class EnvironmentBuilder(object):
     def build(self) -> dict[str, str]:
         """Build the complete environment dictionary."""
         self._build_core_environment()
+        self._build_dcc_paths()
         self._finalize_paths()
 
         for modifier in self._modifiers:
