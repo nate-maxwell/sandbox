@@ -1,16 +1,16 @@
 """
-Stage 4: Startup task executor.
+Startup task executor.
 
 DCC-specific initialization hooks that execute registered startup tasks.
 
 These functions are called from within the DCC (e.g., Maya's userSetup.py)
-after the application has launched with the environment from Stage 1.
-Executes all tasks registered in Stage 2 (startup_registry) in priority order.
+after the application has launched with the environment.
+Executes all tasks registered using startup_registry in priority order.
 """
 
 import logging
 
-from startup_registry import get_registry
+from task import get_registry
 
 
 logger = logging.getLogger(__name__)

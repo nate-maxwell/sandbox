@@ -1,12 +1,8 @@
 """
-Stage 3: DCC application launcher.
+DCC application launcher.
 
 Provides the executable registry and launcher for DCC applications, i.e.
 wrapper objects that represent a registered operable DCC within the pipeline.
-
-This module handles the actual subprocess launching with the environment
-built by Stage 1 (environment_builder). The DCC will then execute Stage 4
-(dcc_startup) which triggers Stage 2 (startup_registry) tasks.
 """
 
 import subprocess

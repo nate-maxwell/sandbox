@@ -1,7 +1,6 @@
 """
 DCC launcher with pre-flight checks.
 
-Replaces old launch.py system with new staged boot process.
 Flight checks run before DCC launch, startup tasks run after.
 """
 

@@ -1,12 +1,8 @@
 """
-Stage 2: Startup task registry and process assembler.
+Startup task registry and process assembler.
 
-Provides a priority-based task registration system for pipeline initialization.
-
-Startup tasks are the processes that execute on application startup.
-
-Tasks are registered via decorator or direct registration, then executed in
-priority order by Stage 4 (dcc_startup) after the DCC launches.
+Herein are the tools to create startup tasks, processes or systems that are
+invoked when an application starts.
 """
 
 import logging
@@ -80,6 +76,7 @@ class StartupRegistry(object):
         enabled: bool = True,
     ) -> StartupTask:
         """Register a startup task"""
+        # noinspection PyUnresolvedReferences
         task_name = name or f"{callback.__module__}.{callback.__name__}"
         task = StartupTask(
             priority=priority,
