@@ -13,7 +13,7 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
-from app_startup import applications
+from app_startup import appspec
 
 
 class EnvironmentBuilder(object):
@@ -29,8 +29,8 @@ class EnvironmentBuilder(object):
     @classmethod
     def build(
         cls,
-        app_spec: applications.ApplicationSpec,
-        app_version: applications.ApplicationVersion,
+        app_spec: appspec.ApplicationSpec,
+        app_version: appspec.ApplicationVersion,
         user_env: Optional[Dict[str, str]] = None,
         inherit_os_env: bool = False,
     ) -> Dict[str, str]:
@@ -77,9 +77,9 @@ class ApplicationLauncher:
     """
 
     def __init__(self) -> None:
-        self._apps: Dict[str, applications.ApplicationSpec] = {}
+        self._apps: Dict[str, appspec.ApplicationSpec] = {}
 
-    def register(self, app_spec: applications.ApplicationSpec) -> None:
+    def register(self, app_spec: appspec.ApplicationSpec) -> None:
         """
         Register an application specification.
 
@@ -181,7 +181,7 @@ def build_launcher() -> ApplicationLauncher:
     """
     launcher = ApplicationLauncher()
 
-    maya_2023 = applications.ApplicationVersion(
+    maya_2023 = appspec.ApplicationVersion(
         version="2023",
         executable=Path("C:/Program Files/Autodesk/Maya2023/bin/maya.exe"),
         python_paths=[
@@ -197,7 +197,7 @@ def build_launcher() -> ApplicationLauncher:
         },
     )
 
-    maya_spec = applications.ApplicationSpec(
+    maya_spec = appspec.ApplicationSpec(
         name="maya",
         versions={"2023": maya_2023},
         default_version="2023",
@@ -207,7 +207,7 @@ def build_launcher() -> ApplicationLauncher:
         flight_checks=[maya_flight_checks],
     )
 
-    nuke_14 = applications.ApplicationVersion(
+    nuke_14 = appspec.ApplicationVersion(
         version="14.0v1",
         executable=Path("C:/Program Files/Nuke14.0/Nuke14.0.exe"),
         python_paths=[
@@ -223,7 +223,7 @@ def build_launcher() -> ApplicationLauncher:
         },
     )
 
-    nuke_spec = applications.ApplicationSpec(
+    nuke_spec = appspec.ApplicationSpec(
         name="nuke",
         versions={"14.0v1": nuke_14},
         default_version="14.0v1",
